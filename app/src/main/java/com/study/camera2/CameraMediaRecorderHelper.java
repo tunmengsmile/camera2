@@ -20,7 +20,6 @@ import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaCodec;
-import android.media.MediaFormat;
 import android.media.MediaRecorder;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
@@ -44,6 +43,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
 import com.study.camera2.view.AutoFitTextureView;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
