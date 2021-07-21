@@ -1,0 +1,10 @@
+
+<CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/text1"
+    android:singleLine="true"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:ellipsize="marquee"
+    android:background="@drawable/magic_id_photo_spinner_shape"
+    android:layout_marginRight="300dp"
+    />

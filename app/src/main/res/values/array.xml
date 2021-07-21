@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="magic_idp_size_category">
+        <item>常用</item>
+        <item>签证</item>
+        <item>职业</item>
+        <item>证件</item>
+        <item>升学</item>
+        <item>考试</item>
+    </string-array>
+    <string-array name="magic_idp_size_category_common">
+        <item></item>
+        <item>一寸</item>
+        <item>二寸</item>
+        <item>小一寸</item>
+        <item>小二寸</item>
+    </string-array>
+    <string-array name="magic_idp_size_category_common_value">
+        <item>100-1024+25-87</item>
+        <item>295X413+25X35</item>
+        <item>413X579+35X49</item>
+        <item>260X378+22X32</item>
+        <item>413X531+35X45</item>
+    </string-array>
+    <string-array name="magic_idp_size_category_visa">
+        <item>世界通用签证照片</item>
+        <item>美国签证</item>
+        <item>越南签证</item>
+        <item>日本签证</item>
+        <item>港澳通行证</item>
+        <item>韩国签证</item>
+        <item>泰国签证(旅游签)</item>
+        <item>泰国签证(落地签)</item>
+        <item>印度签证</item>
+        <item>以色列签证</item>
+        <item>签证采集</item>
+        <item>入台证</item>
+        <item>马来西亚签证</item>
+        <item>新西兰签证</item>
+        <item>意大利签证</item>
+        <item>阿根廷签证</item>
+        <item>巴西、冰岛签证</item>
+        <item>肯尼亚签证</item>
+    </string-array>
+    <string-array name="magic_idp_size_category_visa_value">
+        <item>413X531+35X45</item>
+        <item>600X600+51X51</item>
+        <item>413X531+35X45</item>
+        <item>531X531+45X45</item>
+        <item>390X567+33X48</item>
+        <item>413X531+35X45</item>
+        <item>413X531+35X45</item>
+        <item>472X708+40X60</item>
+        <item>591X591+51X51</item>
+        <item>591X591+51X51</item>
+        <item>354X472+30X40</item>
+        <item>413X531+35X45</item>
+        <item>413X531+35X45</item>
+        <item>900X1200+76X102</item>
+        <item>413X472+35X40</item>
+        <item>472X472+40X40</item>
+        <item>413X531+40X50</item>
+        <item>591X591+50X50</item>
+    </string-array>
+    <string-array name="magic_idp_size_category_profession">
+        <item>中小学生教师资格证</item>
+        <item>教师资格证</item>
+        <item>驾驶证</item>
+        <item>导游证</item>
+        <item>电子导游证</item>
+        <item>国家司法考试</item>
+        <item>一级建造师证（电子版）</item>
+        <item>二级建造师证</item>
+        <item>初级会计职称考试</item>
+        <item>注册会计师</item>
+        <item>北京导游证</item>
+        <item>中级会计职称考试</item>
+        <item>高级会计职称考试</item>
+        <item>会计资格证</item>
+        <item>注册会计师考试</item>
+    </string-array>
+    <string-array name="magic_idp_size_category_profession_value">
+        <item>295X413+25X35</item>
+        <item>180X240+15X20</item>
+        <item>260X378+22X32</item>
+        <item>285X385+23X33</item>
+        <item>413X626+35X53</item>
+        <item>413X626+35X53</item>
+        <item>295X413+25X35</item>
+        <item>215X300+18X25</item>
+        <item>295X413+25X35</item>
+        <item>178X220+15X19</item>
+        <item>413X531+35X45</item>
+        <item>114X156+10X13</item>
+        <item>114X156+10X13</item>
+        <item>500X700+42X59</item>
+        <item>295X413+25X35</item>
+    </string-array>
+    <string-array name="magic_idp_size_category_certificates">
+        <item>社保卡</item>
+        <item>健康证</item>
+        <item>医保卡</item>
+        <item>身份证</item>
+        <item>居住证</item>
+    </string-array>
+    <string-array name="magic_idp_size_category_certificates_value">
+        <item>358X441+26X32</item>
+        <item>295X413+25X35</item>
+        <item>358X441+26X32</item>
+        <item>358X441+26X32</item>
+        <item>358X441+26X32</item>
+    </string-array>
+    <string-array name="magic_idp_size_category_education">
+        <item>入学报名</item>
+        <item>学籍网</item>
+        <item>小学生学籍</item>
+        <item>学籍照片</item>
+        <item>大学入学</item>
+        <item>高考报名</item>
+        <item>简历照</item>
+    </string-array>
+    <string-array name="magic_idp_size_category_education_value">
+        <item>295X413+25X35</item>
+        <item>472X630+80X107</item>
+        <item>300X420+25X36</item>
+        <item>390X480+33X41</item>
+        <item>413X531+35X45</item>
+        <item>390X567+33X48</item>
+        <item>295X413+25X35</item>
+    </string-array>
+    <string-array name="magic_idp_size_category_examination">
+        <item>英语四六级考试1</item>
+        <item>英语四六级考试2</item>
+        <item>英语四六级考试3</item>
+        <item>普通话水平测试1</item>
+        <item>普通话水平测试2</item>
+        <item>学位英语</item>
+        <item>英语AB级</item>
+        <item>英语三级考试</item>
+        <item>计算机等级考试1</item>
+        <item>计算机等级考试2</item>
+    </string-array>
+    <string-array name="magic_idp_size_category_examination_value">
+        <item>144X192+12X16</item>
+        <item>240X320+20X27</item>
+        <item>150X200+13X17</item>
+        <item>144X192+12X16</item>
+        <item>390X567+33X48</item>
+        <item>140X180+12X15</item>
+        <item>295X413+25X35</item>
+        <item>144X192+33X48</item>
+        <item>240X320+20X27</item>
+        <item>144X192+33X48</item>
+    </string-array>
+    <string-array name="spinner_list" >
+        <item>px</item>
+        <item>mm</item>
+    </string-array>
+
+    <string-array name="magic_effects_video_titles">
+        <item></item>
+        <item>彩色描边</item>
+        <item>虚线描边</item>
+        <item>荧光描边</item>
+        <item>彩色拖影</item>
+        <item>彩条拖影</item>
+        <item>电波扫过</item>
+        <item>对称流动</item>
+        <item>流动电波</item>
+        <item>文字排版</item>
+        <item>粒子环绕</item>
+        <item>恶魔天使</item>
+        <item>天使翅膀</item>
+        <item>光流翅膀</item>
+    </string-array>
+    <string-array name="magic_effects_audio_titles">
+        <item></item>
+        <item></item>
+        <item>徜徉</item>
+        <item>微风</item>
+        <item>如梦</item>
+        <item>归云</item>
+        <item>拾忆</item>
+        <item>萌芽</item>
+        <item>蜿蜒</item>
+        <item>深音</item>
+        <item>流影</item>
+        <item>简约</item>
+        <item>迷离</item>
+        <item>浮岚</item>
+    </string-array>
+    <string-array name="magic_effects_title">
+        <item>RGB</item>
+        <item>故障风</item>
+        <item>百叶窗</item>
+        <item>素描</item>
+        <item>水彩</item>
+        <item>窗雾</item>
+    </string-array>
+
+    <string-array name="magic_id_photo_edit_hint_px_array" >
+        <item>100-1024</item>
+        <item>100-1024</item>
+    </string-array>
+
+    <string-array name="magic_id_photo_edit_hint_mm_array" >
+        <item>10-120</item>
+        <item>10-120</item>
+    </string-array>
+</resources>
