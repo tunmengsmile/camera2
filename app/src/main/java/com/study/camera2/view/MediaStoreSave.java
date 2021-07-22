@@ -4,11 +4,15 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 
 import com.study.camera2.MyApplication;
 
+import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 
@@ -44,6 +48,7 @@ public class MediaStoreSave {
         //根据手机NAND闪存这个叫做“主要存储”(primary storage)的库名生成URI// 其实是将数据保存到external_primary 目录下面；
         Uri contentUri = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
         Uri  mInsert = null;
+
         if (contentUri!=null){
             mInsert = mContext.getContentResolver().insert(contentUri, values);
         }
@@ -72,6 +77,12 @@ public class MediaStoreSave {
             }
 
         }
+    }
+
+    public  Bitmap getBitmap(ContentResolver rs ,Uri uri) throws FileNotFoundException {
+        ParcelFileDescriptor fd = rs.openFileDescriptor(uri, "r");
+            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(fd.getFileDescriptor());
+            return bitmap;
     }
 
 

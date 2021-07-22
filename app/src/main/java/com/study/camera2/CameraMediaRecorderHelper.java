@@ -3,9 +3,12 @@ package com.study.camera2;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.RecoverableSecurityException;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -74,12 +77,14 @@ public class CameraMediaRecorderHelper {
         DEFAULT_ORIENTATIONS.append(Surface.ROTATION_180, 270);
         DEFAULT_ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
+
     static {
         INVERSE_ORIENTATIONS.append(Surface.ROTATION_0, 270);
         INVERSE_ORIENTATIONS.append(Surface.ROTATION_90, 180);
         INVERSE_ORIENTATIONS.append(Surface.ROTATION_180, 90);
         INVERSE_ORIENTATIONS.append(Surface.ROTATION_270, 0);
     }
+
     private Activity mActivity;
     private AutoFitTextureView mTextureView;
     private CameraManager mCameraManager;
@@ -114,6 +119,7 @@ public class CameraMediaRecorderHelper {
     //视频录制状态的标记
     private boolean mIsRecordingVideo;
     private FileDescriptor fd;
+    private Cursor cursor;
 
     @SuppressLint("NewApi")
     public CameraMediaRecorderHelper(Activity mActivity, AutoFitTextureView mTextureView) {
@@ -300,7 +306,7 @@ public class CameraMediaRecorderHelper {
         if (null == CameraDevice || !mTextureView.isAvailable() || null == previewSize) {
             return;
         }
-        mSurface = new Surface( mTextureView.getSurfaceTexture());
+        mSurface = new Surface(mTextureView.getSurfaceTexture());
         try {
             //在mediaRecorder prepare()之后这个设置的mRecorderSurface 才可以使用,相当于我们创建
             //session 时就就初始化了一次mediaRecorder,并且这个mediRecorder状态到了prepare()时这个surface 才可以使用
@@ -309,7 +315,7 @@ public class CameraMediaRecorderHelper {
             //设置缓冲区预览的大小
             surfaceTexture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
             //发起创建session 的请求 预览只需要一个surface
-            CameraDevice.createCaptureSession(Arrays.asList(mSurface,mRecorderSurface), sessionStateCb, mCameraHandler);
+            CameraDevice.createCaptureSession(Arrays.asList(mSurface, mRecorderSurface), sessionStateCb, mCameraHandler);
 
         } catch (CameraAccessException | IllegalStateException | FileNotFoundException e) {
             e.printStackTrace();
@@ -372,7 +378,7 @@ public class CameraMediaRecorderHelper {
     /****
      * 设置捕获的监听器；
      */
-    public  CameraCaptureSession.CaptureCallback CaptureCallback =new CameraCaptureSession.CaptureCallback() {
+    public CameraCaptureSession.CaptureCallback CaptureCallback = new CameraCaptureSession.CaptureCallback() {
 
         @Override
         public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
@@ -403,7 +409,7 @@ public class CameraMediaRecorderHelper {
             mMediaRecorder.reset();
 
         }
-        if (mRecorderSurface!=null){
+        if (mRecorderSurface != null) {
             // 设置surface
             mMediaRecorder.setInputSurface(mRecorderSurface);
         }
@@ -445,7 +451,7 @@ public class CameraMediaRecorderHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             //输出的目录设置；
             mMediaRecorder.setOutputFile(fd);
-        }else {
+        } else {
             //设置file 路径目前先用应用私有目录代替， 因为10 以上版本只有这个目录可以创建file
             //输出的目录设置；
 
@@ -486,7 +492,7 @@ public class CameraMediaRecorderHelper {
             }).start();
 
         } catch (Exception e) {
-            mIsRecordingVideo =false;
+            mIsRecordingVideo = false;
             e.printStackTrace();
         }
 
@@ -507,9 +513,9 @@ public class CameraMediaRecorderHelper {
                 e.printStackTrace();
             }
         }
+        //获取视频的缩略图
+        Bitmap bitmap = getVideoThumbnail(mActivity.getContentResolver(), uri);
     }
-
-
 
 
     /**
@@ -536,8 +542,6 @@ public class CameraMediaRecorderHelper {
             e.printStackTrace();
         }
     }
-
-
 
 
     /***
@@ -627,6 +631,7 @@ public class CameraMediaRecorderHelper {
         Log.e("tag", "getMatchingSize2: 选择的分辨率高度=" + selectSize.getHeight());
         return selectSize;
     }
+
     /***
      * 匹配合适的预览尺寸
      * @param choices
@@ -690,7 +695,6 @@ public class CameraMediaRecorderHelper {
     }
 
 
-
     /****************----------------------------分区存储-----------------------------*******************/
 
     /**
@@ -706,41 +710,46 @@ public class CameraMediaRecorderHelper {
 
     /**
      * 返回文件描述符
+     *
      * @param context
      * @param videoName
      * @param mineType
      * @return
      * @throws
      */
-    public static FileDescriptor getSaveToGalleryVideoOutputStream(@NonNull Context context, @NonNull String videoName, @NonNull String mineType,String subDir) throws FileNotFoundException {
-        Uri uri;
+    Uri uri;
+
+    public FileDescriptor getSaveToGalleryVideoOutputStream(@NonNull Context context, @NonNull String videoName, @NonNull String mineType, String subDir) throws FileNotFoundException {
+
         //大于29 进行分区存储
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             //最后一个参数创建子目录；
-            uri = getSaveToGalleryVideoUri(context, videoName, mineType,subDir);
+            uri = getSaveToGalleryVideoUri(context, videoName, mineType, subDir);
             if (uri == null)
                 return null;
             ParcelFileDescriptor fileDescriptor = context.getContentResolver().openFileDescriptor(uri, "w");
             FileDescriptor mfileDescriptor = fileDescriptor.getFileDescriptor();
-            return  mfileDescriptor;
-        }else {
+            return mfileDescriptor;
+        } else {
 
             return null;
         }
 
+
     }
+
     /***
      *
      * @param context  上下文
      * @param videoName  视频文件名字带有后缀名如 :"123.mp4"
      * @param mineType  视频格式类型如："video/mp4"
      * @param subDir   创建的子目录如："/ucam"
-     * @return  uri
+     * @return uri
      */
-    static Uri getSaveToGalleryVideoUri(Context context, String videoName, String mineType, String subDir) {
+    public Uri getSaveToGalleryVideoUri(Context context, String videoName, String mineType, String subDir) {
         ContentValues values = new ContentValues();
         //视频的名字
-        values.put(MediaStore.Video.Media.DISPLAY_NAME,  videoName);
+        values.put(MediaStore.Video.Media.DISPLAY_NAME, videoName);
         //视频类型；
         values.put(MediaStore.Video.Media.MIME_TYPE, mineType);
         //修改时间
@@ -748,17 +757,15 @@ public class CameraMediaRecorderHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             //大于等于10 的版本设置子目录
             values.put(MediaStore.Video.Media.RELATIVE_PATH, Environment.DIRECTORY_MOVIES + subDir);
+        } else {
+            //数据库表中列字段存储的是数据的绝对路径；android 10 之前，将绝对路径设置到这个key中；这个字段可能在后面的数据库查询可能会用到；
+            values.put(MediaStore.MediaColumns.DATA, getpath());
         }
-        //获取media 中视频存储的目录uri
-        Uri contentUri = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-        Uri  mInsert = null;
-        if (contentUri!=null){
-            //通过内容解析者将uri 插入到表中；
-            mInsert = context.getContentResolver().insert(contentUri, values);
-        }
+        Uri mInsert = context.getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
         return mInsert;
 
     }
+
 
     /***
      * 录制视频的保存路径；
@@ -776,16 +783,49 @@ public class CameraMediaRecorderHelper {
                 + System.currentTimeMillis() + ".mp4";
     }
 
+    /***
+     * 在Android10 之前将创建的绝对路径存放到 数据库表中关键字是：_data的列中
+     * @return
+     */
+    public String getpath() {
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Environment.DIRECTORY_DCIM + File.separator + "ucamera" + File.separator + "123.mp4";
+        File file = new File(path);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+
+        return path;
+    }
+
+
+    /***
+     * 我们通过cursor 查询出来的path 可以进行new file 操作；
+     * @param cr
+     * @param uri
+     * @return
+     */
     //获取缩略图；
-    static Bitmap getVideoThumbnail(ContentResolver cr, Uri uri) {
+    public Bitmap getVideoThumbnail(ContentResolver cr, Uri uri) {
+        query(cr);
         Cursor cursor = null;
         String path;
         try {
+            //数据库表中_data列的字段
             String[] proj = {MediaStore.Video.Media.DATA};
+            //查询获取_data这一列的cursor对象，
             cursor = cr.query(uri, proj, null, null, null);
+            StringBuilder res = new StringBuilder();
+            //获取到列的索引
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            res.append(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA) + "").append("\t\t");
+            //表示指向查询到的列的第一行数据；
             cursor.moveToFirst();
+            res.append("\n");
+            //取出第一行这一列索引的数据
             path = cursor.getString(column_index);
+            res.append(cursor.getString(column_index)).append("\t\t");
+            Log.e("deng", "createCursor: getvideothumbnail " + cr + " count " + cursor.getCount() + " \n" + res);
+
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -793,5 +833,112 @@ public class CameraMediaRecorderHelper {
         }
         return ThumbnailUtils.createVideoThumbnail(path, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
     }
-}
 
+    /***
+     * 查询video 表中的所有数据
+     * @param cr
+     */
+    public void query(ContentResolver cr) {
+        //按照修改时间进行排序；
+        String sortOrder = MediaStore.Images.Media.DATE_MODIFIED + " DESC";
+        //查询video表获取cursor对象;
+        Cursor c = cr.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, null, null, sortOrder);
+        //获取总共有多少列数据
+        int colnum = c.getColumnCount();
+        StringBuilder res = new StringBuilder();
+        //遍历获取列的字段名字和列的索引进行打印;因为默认cursor
+        for (int i = 0; i < colnum; i++) {
+            //"\t" 表示一个tab
+            res.append(c.getColumnName(i)).append(c.getColumnIndex(c.getColumnName(i))).append("\t");
+        }
+        res.append("\n");
+        //将cursor 移动到数据的第一行
+        while (c.moveToNext()) {
+            for (int i = 0; i < colnum; i++) {
+                try {
+                    // 打印每一列中的第一行数据
+                    res.append(c.getString(i)).append("\t");
+                } catch (Exception e) {
+                    res.append(c.getType(i)).append("\t");
+                }
+
+            }
+
+            res.append("\n");
+        }
+        //移动光标到第一行
+        c.moveToFirst();
+        //log打印出我们查询的数据库表数据；
+        Log.d("deng", "zzzh createCursor: addImage " + cr + " count " + c.getCount() + " \n" + res);
+    }
+
+    /***
+     * 根据文件名字，删除应用自己创建的文件；
+     * @param contentResolver
+     * @param name
+     */
+   //_display_name  删除名字 为 这个的数据 1609835774439.mp4
+    public void delete(ContentResolver contentResolver,String name) {
+        try {
+
+            //根据日期降序查询
+            String sortOrder = MediaStore.Images.Media.DATE_MODIFIED + " DESC";
+            //查询条件 根据名字进行查询；
+            String selection = MediaStore.Images.Media.DISPLAY_NAME + "='" + name + "'";
+            //查询获取cursor，所以相当于找带有name的这一行,只显示两列 分别为_id _display_name ;
+            cursor = contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Video.VideoColumns._ID,MediaStore.Images.Media.DISPLAY_NAME}, selection, null, sortOrder);
+
+            if (cursor != null ) {
+                //获取字段为_id 的这个字段列的索引
+                int columnId = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+                //移动到第一行数据
+                cursor.moveToFirst();
+                //获取第一行列字段_id 下面的数据
+                int mediaId = cursor.getInt(columnId);
+                //根据_id 生成uri;
+                Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, mediaId);
+                contentResolver.delete(uri,null,null);
+            }
+        }catch (Exception e){
+            e.toString();
+        }
+        cursor.close();
+    }
+
+    /***
+     * 根据文件名字，删除应用自己创建的文件；
+     * @param contentResolver
+     * @param name
+     */
+    //_display_name  删除名字 为 这个的数据 1609835774439.mp4
+    public void otherDatadelete(ContentResolver contentResolver,String name) {
+        try {
+
+            //根据日期降序查询
+            String sortOrder = MediaStore.Images.Media.DATE_MODIFIED + " DESC";
+            //查询条件 根据名字进行查询；
+            String selection = MediaStore.Images.Media.DISPLAY_NAME + "='" + name + "'";
+            //查询获取cursor，所以相当于找带有name的这一行,只显示两列 分别为_id _display_name ;
+            cursor = contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Video.VideoColumns._ID,MediaStore.Images.Media.DISPLAY_NAME}, selection, null, sortOrder);
+
+            if (cursor != null ) {
+                //获取字段为_id 的这个字段列的索引
+                int columnId = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+                //移动到第一行数据
+                cursor.moveToFirst();
+                //获取第一行列字段_id 下面的数据
+                int mediaId = cursor.getInt(columnId);
+                //根据_id 生成uri;
+                Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, mediaId);
+                contentResolver.delete(uri,null,null);
+            }
+        }catch (RecoverableSecurityException e){
+            e.toString();
+            cursor.close();
+        }
+        cursor.close();
+    }
+
+
+
+}

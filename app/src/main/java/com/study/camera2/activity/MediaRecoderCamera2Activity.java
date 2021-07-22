@@ -82,8 +82,10 @@ public class MediaRecoderCamera2Activity extends AppCompatActivity implements Vi
 
             case R.id.ivExchange:
                 //切换前后摄像头
-                if (cameraMediaRecorderHelper!=null)
-                    cameraMediaRecorderHelper.switchCamera();
+              /*  if (cameraMediaRecorderHelper!=null)
+                    cameraMediaRecorderHelper.switchCamera();*/
+                //
+                cameraMediaRecorderHelper.delete(getContentResolver(),"1609835774439.mp4");
 
                 break;
 
